@@ -1,0 +1,625 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aotabi Gacha Machine</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+
+:root {
+  --blue: #39bdf8;
+  --deep: #1769bd;
+  --pink: #ff80b5;
+  --yellow: #ffe66d;
+  --ink: #18304c;
+  --paper: #fffdf6;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: 'Nunito', sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 10% 15%, #fff0a6 0 5px, transparent 6px),
+    radial-gradient(circle at 88% 30%, #ffacd0 0 6px, transparent 7px),
+    linear-gradient(135deg, #e5f8ff, #fff5fb 55%, #fff9d9);
+  background-size: 75px 75px, 95px 95px, auto;
+}
+
+button, a { font: inherit; }
+
+button { cursor: pointer; }
+
+.wrap {
+  width: min(100% - 28px, 1000px);
+  margin: auto;
+  padding: 24px 0 40px;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 30px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 900;
+  font-size: 19px;
+}
+
+.brand-icon {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border: 3px solid var(--ink);
+  border-radius: 15px;
+  background: var(--yellow);
+  transform: rotate(-5deg);
+  font-size: 25px;
+}
+
+.pill {
+  padding: 8px 14px;
+  border: 2px solid #d6eafa;
+  border-radius: 99px;
+  background: white;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.hero { text-align: center; }
+
+.eyebrow {
+  display: inline-block;
+  padding: 7px 14px;
+  border: 2px solid var(--ink);
+  border-radius: 99px;
+  background: var(--yellow);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+  transform: rotate(-2deg);
+}
+
+h1 {
+  margin: 17px 0 8px;
+  font-size: clamp(38px, 8vw, 70px);
+  line-height: .98;
+  font-weight: 900;
+  letter-spacing: -3px;
+}
+
+h1 span {
+  display: block;
+  color: var(--deep);
+  text-shadow: 3px 3px 0 white;
+}
+
+.subtitle {
+  max-width: 510px;
+  margin: 15px auto 26px;
+  color: #53677e;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.game {
+  display: grid;
+  grid-template-columns: 1fr .9fr;
+  gap: 22px;
+  align-items: center;
+  max-width: 790px;
+  margin: 0 auto;
+}
+
+.machine-card, .prize-card {
+  border: 3px solid var(--ink);
+  border-radius: 27px;
+  background: var(--paper);
+  box-shadow: 7px 7px 0 var(--ink);
+}
+
+.machine-card {
+  padding: 22px;
+  text-align: center;
+  overflow: hidden;
+}
+
+.machine-label {
+  display: inline-block;
+  padding: 7px 13px;
+  border: 2px solid var(--ink);
+  border-radius: 99px;
+  background: var(--pink);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+
+.machine {
+  position: relative;
+  width: min(100%, 300px);
+  margin: 17px auto 0;
+  padding-bottom: 15px;
+}
+
+.dome {
+  position: relative;
+  height: 245px;
+  overflow: hidden;
+  border: 4px solid var(--ink);
+  border-radius: 48% 48% 22px 22px;
+  background: linear-gradient(145deg, #b8efff, #64c8ff 60%, #d4f8ff);
+  box-shadow: inset 0 0 0 7px #ffffff65;
+}
+
+.dome::before {
+  content: "";
+  position: absolute;
+  width: 80px;
+  height: 210px;
+  top: -20px;
+  left: 20px;
+  border-radius: 100%;
+  background: #ffffff35;
+  transform: rotate(18deg);
+}
+
+.capsules {
+  position: absolute;
+  inset: 50px 12px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 3px;
+  transition: transform .3s;
+}
+
+.capsule {
+  display: grid;
+  place-items: center;
+  width: 57px;
+  height: 57px;
+  border: 3px solid #19354e;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #ffb0d2 0 48%, #ff6fa9 49%);
+  box-shadow: inset -4px -4px 0 #00000010;
+  font-size: 23px;
+}
+
+.capsule:nth-child(3n) {
+  background: linear-gradient(145deg, #fff5a1 0 48%, #ffd447 49%);
+}
+.capsule:nth-child(3n + 1) {
+  background: linear-gradient(145deg, #b9f7c8 0 48%, #50d995 49%);
+}
+.capsule:nth-child(4n) {
+  background: linear-gradient(145deg, #e2c6ff 0 48%, #ae8aff 49%);
+}
+
+.machine.shaking .capsules {
+  animation: shake .12s infinite alternate;
+}
+
+@keyframes shake {
+  from { transform: translate(-5px, 3px) rotate(-3deg); }
+  to { transform: translate(5px, -3px) rotate(3deg); }
+}
+
+.machine.shaking .capsule {
+  animation: bounce .3s infinite alternate;
+}
+
+@keyframes bounce {
+  to { transform: translateY(-8px) rotate(10deg); }
+}
+
+.machine-base {
+  position: relative;
+  z-index: 1;
+  width: 90%;
+  height: 83px;
+  margin: -3px auto 0;
+  border: 4px solid var(--ink);
+  border-radius: 14px 14px 20px 20px;
+  background: linear-gradient(90deg, #ffb6d7, #ff83bb);
+  box-shadow: inset 0 -9px 0 #e65c9b40;
+}
+
+.display {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 29px;
+  margin: 10px auto 6px;
+  border: 3px solid var(--ink);
+  border-radius: 7px;
+  background: #e5ffba;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.knob {
+  position: absolute;
+  right: 17px;
+  bottom: 12px;
+  width: 29px;
+  height: 29px;
+  border: 3px solid var(--ink);
+  border-radius: 50%;
+  background: var(--yellow);
+}
+
+.pull-btn {
+  width: 100%;
+  margin-top: 15px;
+  padding: 15px 12px;
+  border: 3px solid var(--ink);
+  border-radius: 15px;
+  background: var(--yellow);
+  box-shadow: 0 5px 0 var(--ink);
+  color: var(--ink);
+  font-weight: 900;
+  font-size: 15px;
+  transition: transform .12s, box-shadow .12s;
+}
+
+.pull-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 7px 0 var(--ink);
+}
+
+.pull-btn:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow: 0 2px 0 var(--ink);
+}
+
+.pull-btn:disabled {
+  cursor: not-allowed;
+  opacity: .65;
+}
+
+.tiny-note {
+  margin: 12px 0 0;
+  color: #73849a;
+  font-size: 11px;
+}
+
+.prize-card {
+  padding: 22px;
+}
+
+.prize-heading {
+  margin: 0 0 5px;
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.prize-sub {
+  margin: 0 0 18px;
+  color: #73849a;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.prize-list {
+  display: grid;
+  gap: 10px;
+}
+
+.prize-row {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 11px;
+  border: 2px solid #e6edf4;
+  border-radius: 15px;
+  background: white;
+}
+
+.prize-emoji {
+  display: grid;
+  place-items: center;
+  flex: 0 0 43px;
+  height: 43px;
+  border-radius: 12px;
+  background: #e5f7ff;
+  font-size: 23px;
+}
+
+.prize-name {
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.prize-desc {
+  margin-top: 2px;
+  color: #7c8b9b;
+  font-size: 11px;
+}
+
+.result {
+  display: none;
+  margin-top: 20px;
+  padding: 18px;
+  border: 3px dashed var(--deep);
+  border-radius: 20px;
+  background: #e8f8ff;
+  text-align: center;
+  animation: pop .35s ease-out;
+}
+
+.result.show { display: block; }
+
+@keyframes pop {
+  from { transform: scale(.85); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.result-emoji { font-size: 48px; }
+
+.result h2 {
+  margin: 5px 0;
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.result p {
+  margin: 7px 0 14px;
+  color: #53677e;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.contact-btn {
+  display: inline-block;
+  padding: 11px 17px;
+  border: 2px solid var(--ink);
+  border-radius: 12px;
+  background: var(--pink);
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.footer {
+  margin-top: 35px;
+  text-align: center;
+  color: #73849a;
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+.footer strong { color: var(--deep); }
+
+@media (max-width: 650px) {
+  .wrap { width: min(100% - 22px, 430px); padding-top: 17px; }
+  .topbar { margin-bottom: 25px; }
+  .game { grid-template-columns: 1fr; gap: 20px; }
+  .machine-card, .prize-card { box-shadow: 5px 5px 0 var(--ink); }
+  .machine-card { padding: 18px; }
+  .prize-card { padding: 19px; }
+  h1 { letter-spacing: -2px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-icon">🐾</div>
+      <span>AOTABI STUDIO</span>
+    </div>
+    <div class="pill">✦ FREE EVENT ✦</div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="eyebrow">A LITTLE SURPRISE FOR YOU!</div>
+      <h1>AOTABI <span>GACHA MACHINE</span></h1>
+      <p class="subtitle">
+        Ready for a little surprise? Pull a capsule and discover
+        your Aotabi gift! Every capsule is a new adventure. 💙
+      </p>
+    </section>
+
+    <section class="game">
+      <div class="machine-card">
+        <div class="machine-label">✦ MYSTERY CAPSULES ✦</div>
+
+        <div class="machine" id="machine">
+          <div class="dome">
+            <div class="capsules" id="capsules">
+              <div class="capsule">💙</div>
+              <div class="capsule">⭐</div>
+              <div class="capsule">🌸</div>
+              <div class="capsule">🐾</div>
+              <div class="capsule">💛</div>
+              <div class="capsule">✨</div>
+              <div class="capsule">🎀</div>
+              <div class="capsule">🩵</div>
+              <div class="capsule">🍀</div>
+            </div>
+          </div>
+          <div class="machine-base">
+            <div class="display" id="display">READY!</div>
+            <div class="knob"></div>
+          </div>
+        </div>
+
+        <button class="pull-btn" id="pullBtn">
+          🎁 PULL YOUR CAPSULE!
+        </button>
+        <p class="tiny-note" id="status">
+          One free pull per browser on this device.
+        </p>
+      </div>
+
+      <div class="prize-card">
+        <h2 class="prize-heading">What's inside? 👀</h2>
+        <p class="prize-sub">
+          A tiny collection of surprises made with love.
+          Here's what you might discover!
+        </p>
+
+        <div class="prize-list">
+          <div class="prize-row">
+            <div class="prize-emoji">🖼️</div>
+            <div>
+              <div class="prize-name">Digital Wallpaper</div>
+              <div class="prize-desc">A little art for your screen</div>
+            </div>
+          </div>
+          <div class="prize-row">
+            <div class="prize-emoji">🐱</div>
+            <div>
+              <div class="prize-name">Chibi Surprise</div>
+              <div class="prize-desc">A cute mini art reward</div>
+            </div>
+          </div>
+          <div class="prize-row">
+            <div class="prize-emoji">🎨</div>
+            <div>
+              <div class="prize-name">Commission Coupon</div>
+              <div class="prize-desc">A special offer from Aotabi</div>
+            </div>
+          </div>
+          <div class="prize-row">
+            <div class="prize-emoji">💌</div>
+            <div>
+              <div class="prize-name">Mystery Gift</div>
+              <div class="prize-desc">A surprise picked just for you</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="result" id="result" aria-live="polite">
+      <div class="result-emoji" id="resultEmoji">🎉</div>
+      <h2 id="resultTitle">You got a gift!</h2>
+      <p id="resultText"></p>
+      <a class="contact-btn" id="contactBtn"
+         href="https://www.fiverr.com/" target="_blank"
+         rel="noopener noreferrer">
+        💌 CLAIM / CONTACT ON FIVERR
+      </a>
+    </section>
+  </main>
+
+  <footer class="footer">
+    Made with 💙 by <strong>Aotabi</strong><br>
+    Thanks for joining this little adventure! ✨
+  </footer>
+</div>
+
+<script>
+/*
+  AOTABI GACHA SETTINGS
+  Edit the prizes and Fiverr link here.
+  This first version remembers a pull in this browser only.
+*/
+
+const FIVERR_LINK = "https://www.fiverr.com/";
+
+const PRIZES = [
+  {
+    name: "Digital Wallpaper",
+    emoji: "🖼️",
+    description: "You got a digital wallpaper! Thank you for joining Aotabi's event."
+  },
+  {
+    name: "Chibi Surprise",
+    emoji: "🐱",
+    description: "You unlocked a chibi art surprise! Follow the claim instructions from Aotabi."
+  },
+  {
+    name: "Commission Coupon",
+    emoji: "🎨",
+    description: "You received a commission coupon! Contact Aotabi to check its terms and validity."
+  },
+  {
+    name: "Mystery Gift",
+    emoji: "💌",
+    description: "A mystery gift is waiting for you! Contact Aotabi for the next steps."
+  }
+];
+
+const STORAGE_KEY = "aotabi_gacha_played_v1";
+
+const machine = document.getElementById("machine");
+const pullBtn = document.getElementById("pullBtn");
+const display = document.getElementById("display");
+const statusText = document.getElementById("status");
+const result = document.getElementById("result");
+const resultEmoji = document.getElementById("resultEmoji");
+const resultTitle = document.getElementById("resultTitle");
+const resultText = document.getElementById("resultText");
+const contactBtn = document.getElementById("contactBtn");
+
+contactBtn.href = FIVERR_LINK;
+
+function showAlreadyPlayed() {
+  pullBtn.disabled = true;
+  pullBtn.textContent = "✓ CAPSULE ALREADY OPENED";
+  statusText.textContent =
+    "A pull has already been used in this browser on this device.";
+  display.textContent = "DONE!";
+}
+
+function pullCapsule() {
+  if (localStorage.getItem(STORAGE_KEY)) {
+    showAlreadyPlayed();
+    return;
+  }
+
+  pullBtn.disabled = true;
+  machine.classList.add("shaking");
+  display.textContent = "ROLLING!";
+  statusText.textContent = "Your surprise is on its way... ✨";
+
+  window.setTimeout(() => {
+    machine.classList.remove("shaking");
+
+    const prize = PRIZES[Math.floor(Math.random() * PRIZES.length)];
+
+    resultEmoji.textContent = prize.emoji;
+    resultTitle.textContent = "You got: " + prize.name + "!";
+    resultText.textContent = prize.description;
+    result.classList.add("show");
+
+    /*
+      Save after the animation reveals a prize.
+      This is a browser-only limit, not secure anti-cheat protection.
+    */
+    localStorage.setItem(STORAGE_KEY, "true");
+
+    display.textContent = "GOT IT!";
+    pullBtn.textContent = "✓ PULL COMPLETED";
+    statusText.textContent =
+      "Your capsule has been opened. Save your prize details!";
+    result.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, 1600);
+}
+
+pullBtn.addEventListener("click", pullCapsule);
+
+if (localStorage.getItem(STORAGE_KEY)) {
+  showAlreadyPlayed();
+}
+</script>
+</body>
+</html>
