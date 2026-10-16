@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Aotabi — 3D Mystery Gacha</title>
+<title>Aotabi — Lucky Raffle</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
 
@@ -82,13 +82,13 @@ footer strong { color:#277fc1 }
 <div class="page">
   <header>
     <div class="brand"><div class="brand-icon">🐾</div>AOTABI</div>
-    <div class="tag">✦ MYSTERY GACHA ✦</div>
+    <div class="tag">✦ LUCKY RAFFLE ✦</div>
   </header>
 
   <section class="hero">
-    <div class="eyebrow">A LITTLE MAGIC, JUST FOR YOU</div>
-    <h1>THE <span>AOTABI GACHA</span></h1>
-    <p class="subtitle">A mysterious capsule, a little sparkle, and an unexpected surprise. What will your adventure reveal? 💙</p>
+    <div class="eyebrow">FOR THE LUCKY ONES</div>
+    <h1><span>GIFTS FROM AOTABI</span></h1>
+    <p class="subtitle">A cute gacha machine that decides your luck! 💙</p>
   </section>
 
   <main class="layout">
@@ -123,9 +123,12 @@ footer strong { color:#277fc1 }
       <button class="action pink" id="secondBtn">🎲 TRY A SECOND PULL</button>
     </div>
     <div id="finalActions" class="hidden">
-      <p><strong>Your prize is final!</strong> Contact Aotabi for claim instructions.</p>
+      <p><strong>🎉 Congratulations, Adventurer!</strong><br>
+        Your prize is secured! Thank you for joining Aotabi Lucky Raffle.
+        Click below to claim your prize on Fiverr.
+      </p>
       <div class="actions">
-        <a class="action" id="fiverrLink" href="https://www.fiverr.com/" target="_blank" rel="noopener noreferrer">💌 CONTACT ON FIVERR</a>
+        <a class="action" id="fiverrLink" href="https://www.fiverr.com/redi_ananda_" target="_blank" rel="noopener noreferrer">🎁 CLAIM HERE</a>
       </div>
     </div>
   </section>
@@ -135,14 +138,19 @@ footer strong { color:#277fc1 }
 <script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js';
 
-const FIVERR_LINK = "https://www.fiverr.com/";
+const FIVERR_LINK = "https://www.fiverr.com/s/Vrrv93m";
+const PRIZE_LINKS = {
+  vtuber: "https://www.fiverr.com/s/Vrrv93m",
+  art: "https://www.fiverr.com/s/xrr59q1",
+  emotes: "https://www.fiverr.com/s/433L9WG"
+};
 const STORAGE_KEY = "aotabi_3d_gacha_v1";
 const PRIZES = [
- {name:"Full Body VTuber + Rigging",value:"$400 service value",icon:"👑",description:"A full-body VTuber model with rigging. Contact Aotabi to confirm the scope, requirements and claim deadline."},
- {name:"Anime Illustration + Background",value:"$200 service value",icon:"🎨",description:"An anime illustration with a background, created with care by Aotabi. Contact Aotabi for claim instructions."},
- {name:"10 Animated Emotes",value:"$200 service value",icon:"💫",description:"A set of 10 animated emotes. Contact Aotabi to discuss expressions, formats and delivery details."},
- {name:"VTuber Model Only",value:"$200 service value",icon:"🐱",description:"A VTuber model illustration without rigging. Contact Aotabi to confirm the specifications and claim steps."},
- {name:"PFP + Background",value:"$40 service value",icon:"💎",description:"A profile picture with a background. Contact Aotabi to discuss the design and claim instructions."}
+ {name:"Full Body VTuber + Rigging",value:"$400 service value",icon:"👑",description:"A full-body VTuber model with rigging. Click CLAIM HERE below to claim your prize."},
+ {name:"Anime Illustration + Background",value:"$200 service value",icon:"🎨",description:"An anime illustration with a background, created with care by Aotabi. Click CLAIM HERE below to claim your prize."},
+ {name:"10 Animated Emotes",value:"$200 service value",icon:"💫",description:"A set of 10 animated emotes. Click CLAIM HERE below to claim your prize."},
+ {name:"VTuber Model Only",value:"$200 service value",icon:"🐱",description:"A VTuber model illustration without rigging. Click CLAIM HERE below to claim your prize."},
+ {name:"PFP + Background",value:"$40 service value",icon:"💎",description:"A profile picture with a background. Click CLAIM HERE below to claim your prize."}
 ];
 
 const stage = document.getElementById("stage");
@@ -497,7 +505,15 @@ function stars() {
   });
 }
 
+function claimLinkForPrize(prize) {
+  const name = prize.name.toLowerCase();
+  if (name.includes("emote")) return PRIZE_LINKS.emotes;
+  if (name.includes("illustration") || name.includes("pfp")) return PRIZE_LINKS.art;
+  return PRIZE_LINKS.vtuber;
+}
+
 function showPrize(prize,second) {
+  document.getElementById("fiverrLink").href = claimLinkForPrize(prize);
   rewardIcon.textContent=prize.icon;
   rewardName.textContent=prize.name;
   rewardValue.textContent=prize.value;
@@ -530,8 +546,14 @@ function completePull(prize,second) {
   exitingCapsule = cap;
   exitStart = performance.now();
 
-  state.pulls.push(prize);
-  if (second) state.final = true;
+  if (second) {
+    // The second pull replaces the first prize and ends the game.
+    state.pulls = [prize];
+    state.final = true;
+  } else {
+    state.pulls = [prize];
+    state.final = false;
+  }
 
   saveState();
 
@@ -595,10 +617,15 @@ keepBtn.addEventListener("click",()=>{
   statusText.textContent="Your first prize is saved in this browser.";
 });
 secondBtn.addEventListener("click",()=>{
-  if(animating || state.pulls.length!==1 || state.final) return;
-  const ok=confirm("Are you sure? Your first prize will be lost and replaced by the second prize. This cannot be undone.");
-  if(!ok) return;
-  state.pulls=[]; saveState();
+  // The button is only available while the first prize is awaiting a decision.
+  // Avoid a browser confirm dialog here because some browsers/web previews block it.
+  if (animating) return;
+  if (!state || !Array.isArray(state.pulls) || state.pulls.length !== 1 || state.final) {
+    statusText.textContent = "Your first prize must be open before you can try a second pull.";
+    return;
+  }
+  choiceActions.classList.add("hidden");
+  choiceQuestion.textContent = "Your second pull is starting! Your first prize will be replaced.";
   pull(true);
 });
 
