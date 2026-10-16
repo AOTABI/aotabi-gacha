@@ -218,82 +218,221 @@ function makeEar(x) {
   return ear;
 }
 
-function buildMachine() {
-  scene=new THREE.Scene();
-  scene.background=null;
-  camera=new THREE.PerspectiveCamera(35,1,.1,100);
-  camera.position.set(5.4,4.0,8.4);
-  camera.lookAt(0,1.35,0);
 
-  renderer=new THREE.WebGLRenderer({alpha:true,antialias:true,powerPreference:"high-performance"});
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.8));
-  renderer.outputColorSpace=THREE.SRGBColorSpace;
-  renderer.toneMapping=THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure=1.2;
+function buildMachine() {
+  scene = new THREE.Scene();
+
+  camera = new THREE.PerspectiveCamera(32, 1, 0.1, 100);
+  camera.position.set(4.6, 3.5, 9.8);
+  camera.lookAt(0, 1.55, 0);
+
+  renderer = new THREE.WebGLRenderer({
+    alpha: true,
+    antialias: true,
+    powerPreference: "high-performance"
+  });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.7));
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.2;
   stage.replaceChildren(renderer.domElement);
 
-  scene.add(new THREE.HemisphereLight(0xe6f8ff,0x5579a0,2.1));
-  const key=new THREE.DirectionalLight(0xffffff,3.1); key.position.set(4,7,5); scene.add(key);
-  const rim=new THREE.DirectionalLight(0x69d6ff,2.4); rim.position.set(-4,4,-3); scene.add(rim);
-  const pinkLight=new THREE.PointLight(0xffa6d4,55,10); pinkLight.position.set(-2,2.5,2); scene.add(pinkLight);
+  scene.add(new THREE.HemisphereLight(0xeaf8ff, 0x526b99, 2.3));
 
-  machine=new THREE.Group(); scene.add(machine);
-  machine.rotation.y=-.12;
+  const key = new THREE.DirectionalLight(0xffffff, 3.5);
+  key.position.set(4, 7, 6);
+  scene.add(key);
 
-  // Heavy rounded base with a real 3D body.
-  addMesh(machine,new THREE.CylinderGeometry(1.12,1.18,.22,64,1),material(0x155d9d,.3,.12),[0,.15,0]);
-  addMesh(machine,new THREE.CylinderGeometry(1.06,1.13,1.05,64,1),material(0x35a9ed,.24,.12),[0,.75,0]);
-  addMesh(machine,new THREE.CylinderGeometry(1.09,1.1,.12,64,1),material(0x9be5ff,.22,.1),[0,1.29,0]);
-  addMesh(machine,new THREE.TorusGeometry(1.1,.055,14,64),material(0xf1fdff,.2,.15),[0,1.35,0],[1,1,1],[Math.PI/2,0,0]);
+  const rim = new THREE.DirectionalLight(0x45caff, 3);
+  rim.position.set(-4, 4, -3);
+  scene.add(rim);
 
-  // Glass dome and chrome-like rings.
-  const glass=material(0x88ddff,.12,.08,{transparent:true,opacity:.2,side:THREE.DoubleSide,depthWrite:false});
-  const dome=addMesh(machine,new THREE.SphereGeometry(1.13,48,32,0,Math.PI*2,0,Math.PI/2),glass,[0,2.12,0],[1,1.08,1]);
-  addMesh(machine,new THREE.TorusGeometry(1.13,.045,12,64),material(0x76d9ff,.18,.18),[0,1.38,0],[1,1,1],[Math.PI/2,0,0]);
-  addMesh(machine,new THREE.TorusGeometry(1.02,.018,8,64),material(0xffffff,.18,.08,{transparent:true,opacity:.75}),[0,2.35,0],[1,1,1],[Math.PI/2,0,0]);
+  const pinkLight = new THREE.PointLight(0xff9fd4, 30, 9);
+  pinkLight.position.set(-2, 3, 3);
+  scene.add(pinkLight);
 
-  // Cat ears and cute face details on the front.
-  makeEar(-.64); makeEar(.64);
-  addMesh(machine,new THREE.SphereGeometry(.075,16,12),material(0xffffff),[-.28,1.1,.99],[1,1,.35]);
-  addMesh(machine,new THREE.SphereGeometry(.075,16,12),material(0xffffff),[.28,1.1,.99],[1,1,.35]);
-  addMesh(machine,new THREE.SphereGeometry(.055,16,12),material(0xff9fce),[0,1.02,1.04],[1,1,.35]);
-  addMesh(machine,new THREE.BoxGeometry(.48,.1,.08),material(0x12548b),[0,.88,1.02]);
+  machine = new THREE.Group();
+  scene.add(machine);
 
-  // Front screen and gold knob.
-  addMesh(machine,new THREE.BoxGeometry(.62,.22,.13),material(0x154e7b,.24),[0,.57,1.01]);
-  addMesh(machine,new THREE.BoxGeometry(.5,.12,.04),material(0xc9ffb5,.2),[0,.57,1.09]);
-  addMesh(machine,new THREE.CylinderGeometry(.13,.13,.09,32),material(0x155b99,.25),[.72,.7,.94],[1,1,1],[Math.PI/2,0,0]);
-  addMesh(machine,new THREE.SphereGeometry(.115,24,16),material(0xffd96a,.2,.1),[.72,.7,1.03]);
-  addMesh(machine,new THREE.TorusGeometry(.13,.018,8,32),material(0xffffff,.2),[.72,.7,1.04],[1,1,1],[Math.PI/2,0,0]);
+  const blue = material(0x2388d1, 0.24, 0.16);
+  const lightBlue = material(0x83dcff, 0.2, 0.12);
+  const white = material(0xf5fcff, 0.22, 0.05);
+  const gold = material(0xffd36d, 0.23, 0.35);
+  const darkBlue = material(0x124775, 0.28, 0.12);
+  const pink = material(0xff9bcf, 0.3, 0.05);
 
-  // Capsule collection inside the glass dome.
-  capsuleGroup=new THREE.Group(); machine.add(capsuleGroup);
-  const colors=[[0xffa5d0,0xff66ac],[0x8de4ff,0x268bd8],[0xffec9a,0xffbc3c],[0xcab4ff,0x8969df],[0xa9ffd5,0x38c995]];
-  capsuleObjects=[];
-  for(let i=0;i<17;i++) {
-    const c=colors[i%colors.length];
-    const ball=makeCapsule(c[0],c[1]);
-    const angle=i*2.399;
-    const radius=.25+Math.random()*.59;
-    ball.position.set(Math.cos(angle)*radius,1.65+Math.random()*.92,Math.sin(angle)*radius);
-    ball.userData={base:ball.position.clone(),phase:Math.random()*6.28,speed:.8+Math.random()*1.8};
-    capsuleGroup.add(ball); capsuleObjects.push(ball);
+  // Wide, substantial circular pedestal
+  addMesh(machine, new THREE.CylinderGeometry(1.4, 1.48, 0.2, 64),
+    darkBlue, [0, 0.1, 0]);
+
+  addMesh(machine, new THREE.CylinderGeometry(1.34, 1.4, 0.15, 64),
+    gold, [0, 0.25, 0]);
+
+  addMesh(machine, new THREE.CylinderGeometry(1.24, 1.3, 0.85, 64),
+    blue, [0, 0.75, 0]);
+
+  addMesh(machine, new THREE.CylinderGeometry(1.3, 1.3, 0.12, 64),
+    lightBlue, [0, 1.2, 0]);
+
+  // Thick collar under the glass globe
+  addMesh(machine, new THREE.TorusGeometry(1.22, 0.075, 16, 64),
+    gold, [0, 1.28, 0], null, [Math.PI / 2, 0, 0]);
+
+  // Large transparent globe, with a visible blue rim
+  const glass = new THREE.MeshPhysicalMaterial({
+    color: 0x9be5ff,
+    roughness: 0.08,
+    metalness: 0.02,
+    transparent: true,
+    opacity: 0.22,
+    side: THREE.DoubleSide,
+    depthWrite: false,
+    clearcoat: 1,
+    clearcoatRoughness: 0.05
+  });
+
+  addMesh(machine, new THREE.SphereGeometry(1.2, 64, 48),
+    glass, [0, 2.3, 0], [1, 1.03, 1]);
+
+  addMesh(machine, new THREE.TorusGeometry(1.19, 0.055, 16, 64),
+    lightBlue, [0, 1.55, 0], null, [Math.PI / 2, 0, 0]);
+
+  addMesh(machine, new THREE.TorusGeometry(1.08, 0.025, 12, 64),
+    white, [0, 2.55, 0], null, [Math.PI / 2, 0, 0]);
+
+  // Capsule collection
+  capsuleGroup = new THREE.Group();
+  machine.add(capsuleGroup);
+  capsuleObjects = [];
+
+  const colors = [
+    [0xffa5d0, 0xff66ac],
+    [0x8de4ff, 0x268bd8],
+    [0xffec9a, 0xffbc3c],
+    [0xcab4ff, 0x8969df],
+    [0xa9ffd5, 0x38c995]
+  ];
+
+  for (let i = 0; i < 21; i++) {
+    const c = colors[i % colors.length];
+    const ball = makeCapsule(c[0], c[1]);
+    const angle = i * 2.399;
+    const radius = 0.25 + Math.random() * 0.68;
+
+    ball.position.set(
+      Math.cos(angle) * radius,
+      1.8 + Math.random() * 0.8,
+      Math.sin(angle) * radius
+    );
+
+    ball.userData = {
+      base: ball.position.clone(),
+      phase: Math.random() * Math.PI * 2,
+      speed: 0.8 + Math.random() * 1.5
+    };
+
+    capsuleGroup.add(ball);
+    capsuleObjects.push(ball);
   }
 
-  // Side feet and rounded capsule outlet.
-  for(const x of [-.7,.7]) addMesh(machine,new THREE.CylinderGeometry(.12,.16,.22,24),material(0x1769ad,.32),[x,.03,.1]);
-  addMesh(machine,new THREE.BoxGeometry(.82,.28,.36),material(0x14568d,.3),[0,.03,1.03]);
-  addMesh(machine,new THREE.BoxGeometry(.53,.08,.08),material(0x061f42,.25),[0,.04,1.23]);
+  // Front control panel
+  addMesh(machine, new THREE.BoxGeometry(0.78, 0.48, 0.16),
+    darkBlue, [0, 0.82, 1.17]);
 
-  // Soft floor shadow.
-  const shadowMat=new THREE.MeshBasicMaterial({color:0x78bde0,transparent:true,opacity:.18,depthWrite:false});
-  const shadow=addMesh(scene,new THREE.CircleGeometry(1.5,48),shadowMat,[0,-.01,0],[1.2,.65,1],[ -Math.PI/2,0,0]);
-  shadow.rotation.x=-Math.PI/2;
+  addMesh(machine, new THREE.BoxGeometry(0.58, 0.27, 0.05),
+    lightBlue, [0, 0.84, 1.27]);
 
-  resizeObserver=new ResizeObserver(resize);
+  // Decorative star on the panel
+  const starShape = new THREE.Shape();
+  for (let i = 0; i < 10; i++) {
+    const angle = Math.PI / 2 + i * Math.PI / 5;
+    const radius = i % 2 === 0 ? 0.13 : 0.06;
+    const x = Math.cos(angle) * radius;
+    const y = Math.sin(angle) * radius;
+    if (i === 0) starShape.moveTo(x, y);
+    else starShape.lineTo(x, y);
+  }
+  starShape.closePath();
+
+  const starGeo = new THREE.ExtrudeGeometry(starShape, {
+    depth: 0.035,
+    bevelEnabled: true,
+    bevelThickness: 0.015,
+    bevelSize: 0.012,
+    bevelSegments: 2
+  });
+
+  addMesh(machine, starGeo, gold, [0, 0.72, 1.31]);
+
+  // Large golden rotary knob
+  addMesh(machine, new THREE.CylinderGeometry(0.23, 0.23, 0.12, 40),
+    gold, [0.76, 0.78, 1.08], null, [Math.PI / 2, 0, 0]);
+
+  addMesh(machine, new THREE.CylinderGeometry(0.16, 0.16, 0.14, 40),
+    white, [0.76, 0.78, 1.16], null, [Math.PI / 2, 0, 0]);
+
+  // Cat ears: blue outer ears and pink inner ears
+  function addCatEar(x, tilt) {
+    const ear = new THREE.Group();
+    ear.position.set(x, 3.48, 0);
+    ear.rotation.z = tilt;
+    machine.add(ear);
+
+    addMesh(ear, new THREE.SphereGeometry(1, 24, 20),
+      blue, [0, 0, 0], [0.32, 0.48, 0.19]);
+
+    addMesh(ear, new THREE.ConeGeometry(0.32, 0.7, 32),
+      blue, [0, 0.28, 0], [1, 1, 0.65]);
+
+    addMesh(ear, new THREE.SphereGeometry(1, 24, 20),
+      pink, [0, 0.06, 0.145], [0.17, 0.27, 0.055]);
+  }
+
+  addCatEar(-0.72, -0.22);
+  addCatEar(0.72, 0.22);
+
+  // Capsule dispensing tunnel on the front
+  addMesh(machine, new THREE.BoxGeometry(0.78, 0.48, 0.32),
+    darkBlue, [0, 0.24, 1.13]);
+
+  addMesh(machine, new THREE.BoxGeometry(0.56, 0.28, 0.08),
+    material(0x061f42, 0.3), [0, 0.26, 1.32]);
+
+  addMesh(machine, new THREE.BoxGeometry(0.68, 0.08, 0.42),
+    lightBlue, [0, -0.01, 1.23]);
+
+  // Paw-shaped side decorations
+  for (const side of [-1, 1]) {
+    addMesh(machine, new THREE.SphereGeometry(0.16, 24, 18),
+      white, [side * 1.12, 0.83, 0.35], [0.8, 1, 0.45]);
+
+    for (let i = 0; i < 3; i++) {
+      addMesh(machine, new THREE.SphereGeometry(0.045, 16, 12),
+        gold, [side * 1.12 + (i - 1) * 0.075, 0.91, 0.41],
+        [1, 1, 0.6]);
+    }
+  }
+
+  // Soft ground shadow
+  const shadow = new THREE.Mesh(
+    new THREE.CircleGeometry(1.65, 64),
+    new THREE.MeshBasicMaterial({
+      color: 0x64a9d7,
+      transparent: true,
+      opacity: 0.17,
+      depthWrite: false
+    })
+  );
+  shadow.rotation.x = -Math.PI / 2;
+  shadow.position.y = -0.02;
+  shadow.scale.set(1.15, 0.8, 1);
+  scene.add(shadow);
+
+  resizeObserver = new ResizeObserver(resize);
   resizeObserver.observe(stage);
   resize();
 }
+
 
 function resize() {
   if(!renderer || !camera) return;
@@ -373,24 +512,47 @@ function showPrize(prize,second) {
   result.scrollIntoView({behavior:"smooth",block:"center"});
 }
 
+
 function completePull(prize,second) {
-  spinning=false;
-  const chosen=capsuleObjects[Math.floor(Math.random()*capsuleObjects.length)];
-  const pos=chosen.position.clone();
-  const cap=makeCapsule(0x8de4ff,0x268bd8);
-  cap.position.copy(pos); cap.position.y=1.65;
-  machine.add(cap); exitingCapsule=cap; exitStart=performance.now();
+  spinning = false;
+
+  const chosen = capsuleObjects[
+    Math.floor(Math.random() * capsuleObjects.length)
+  ];
+
+  const pos = chosen.position.clone();
+  const cap = makeCapsule(0x8de4ff, 0x268bd8);
+
+  cap.position.copy(pos);
+  cap.position.y = 1.65;
+
+  machine.add(cap);
+  exitingCapsule = cap;
+  exitStart = performance.now();
+
   state.pulls.push(prize);
-  if(second) state.final=true;
+  if (second) state.final = true;
+
   saveState();
-  pullBtn.disabled=true;
-  pullBtn.textContent=second?"✓ SECOND PULL COMPLETE":"✓ CAPSULE OPENED";
-  statusText.textContent="✨ Your mystery capsule has arrived!";
-  document.getElementById("stage").style.filter="brightness(1.04)";
-  setTimeout(()=>document.getElementById("stage").style.filter="",350);
-  showPrize(prize,second);
-  animating=false;
+
+  pullBtn.disabled = true;
+  pullBtn.textContent = second
+    ? "✓ SECOND PULL COMPLETE"
+    : "✓ CAPSULE OPENED";
+
+  statusText.textContent = "✨ Your mystery capsule has arrived!";
+
+  document.getElementById("stage").style.filter = "brightness(1.04)";
+  setTimeout(() => {
+    document.getElementById("stage").style.filter = "";
+  }, 350);
+
+  setTimeout(() => {
+    showPrize(prize, second);
+    animating = false;
+  }, 1150);
 }
+
 
 function pull(second=false) {
   if(animating || state.final || state.pulls.length!== (second?1:0)) return;
